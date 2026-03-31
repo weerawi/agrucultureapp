@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Colors, Spacing } from '../../theme';
 
 interface StepIndicatorProps {
@@ -46,14 +47,12 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
                   isCompleted && styles.circleCompleted,
                 ]}
               >
-                <Text
+                  {isCompleted ? <Ionicons name="checkmark" size={14} color="#fff" /> : <Text
                   style={[
                     styles.circleText,
                     (isActive || isCompleted) && styles.circleTextActive,
                   ]}
-                >
-                  {isCompleted ? '✓' : step}
-                </Text>
+                >{step}</Text>}
               </View>
               <Text
                 style={[

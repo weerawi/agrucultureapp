@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Colors, Spacing, BorderRadius, Typography } from '../theme';
 import { useSettingsStore } from '../store/useSettingsStore';
 import { Language } from '../types';
@@ -64,14 +65,15 @@ const LanguageSelectScreen: React.FC<LanguageSelectScreenProps> = ({ onContinue 
                 </Text>
               )}
               {language === lang.key && (
-                <Text style={styles.checkIcon}>✓</Text>
+                <Ionicons name="checkmark-circle" size={22} color={Colors.primary} />
               )}
             </TouchableOpacity>
           ))}
         </View>
 
         <TouchableOpacity style={styles.continueBtn} onPress={onContinue} activeOpacity={0.8}>
-          <Text style={styles.continueText}>Continue →</Text>
+          <Text style={styles.continueText}>Continue</Text>
+          <Ionicons name="arrow-forward" size={20} color={Colors.white} style={{ marginLeft: 6 }} />
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -153,6 +155,8 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.md,
     width: '100%',
     alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   continueText: {
     ...Typography.bodyBold,

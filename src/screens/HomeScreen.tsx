@@ -8,6 +8,7 @@ import {
   Platform,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Colors, Spacing } from '../theme';
 import { AppButton } from '../components/common/AppButton';
@@ -94,15 +95,16 @@ const HomeScreen = () => {
       <View style={styles.footer}>
         {currentStep > 1 && (
           <AppButton
-            title={`← ${t('common.back')}`}
+            title={t('common.back')}
             variant="outline"
             onPress={prevStep}
             fullWidth={false}
             style={styles.backBtn}
+            icon={<Ionicons name="arrow-back" size={18} color={Colors.primary} />}
           />
         )}
           <AppButton
-            title={`${t('common.next')} →`}
+            title={t('common.next')}
             onPress={handleNext}
             disabled={!canProceed()}
             style={styles.nextBtn}

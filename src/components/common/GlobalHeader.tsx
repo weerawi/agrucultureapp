@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Colors, Spacing, Typography } from '../../theme';
 
 interface GlobalHeaderProps {
@@ -22,7 +23,7 @@ const GlobalHeader: React.FC<GlobalHeaderProps> = ({ onProfilePress }) => {
       </View>
       {onProfilePress && (
         <TouchableOpacity onPress={onProfilePress} style={styles.profileBtn}>
-          <Text style={styles.profileIcon}>👤</Text>
+          <Ionicons name="person-circle-outline" size={28} color={Colors.primaryDark} />
         </TouchableOpacity>
       )}
     </View>

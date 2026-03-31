@@ -6,6 +6,8 @@ import {
   Alert,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
 import { AppButton } from '../common/AppButton';
@@ -145,7 +147,7 @@ const Step4ProfitAnalysis = () => {
 
       {/* Breakdown Card */}
       <View style={styles.card}>
-        <Text style={styles.cardTitle}>💰 {t('wizard.profitBreakdown')}</Text>
+        <Text style={styles.cardTitle}><Ionicons name="cash" size={18} color={Colors.primaryDark} /> {t('wizard.profitBreakdown')}</Text>
 
         <View style={styles.row}>
           <Text style={styles.rowLabel}>{t('wizard.pricePerKg')}</Text>
@@ -194,7 +196,10 @@ const Step4ProfitAnalysis = () => {
       <View style={styles.detailsRow}>
         <View style={styles.detailItem}>
           <Text style={styles.detailLabel}>{t('wizard.vehicle')}</Text>
-          <Text style={styles.detailValue}>{vehicle?.icon} {vehicle ? t(vehicle.nameKey) : ''}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            {vehicle && <MaterialCommunityIcons name={vehicle.icon as any} size={18} color={Colors.primaryDark} />}
+            <Text style={styles.detailValue}>{vehicle ? t(vehicle.nameKey) : ''}</Text>
+          </View>
         </View>
         <View style={styles.detailItem}>
           <Text style={styles.detailLabel}>{t('wizard.market')}</Text>
@@ -204,11 +209,12 @@ const Step4ProfitAnalysis = () => {
 
       {/* Save Button */}
       <AppButton
-        title={saved ? `✓ ${t('wizard.saved')}` : t('wizard.saveToHistory')}
+        title={saved ? t('wizard.saved') : t('wizard.saveToHistory')}
         onPress={handleSave}
         loading={saving}
         disabled={saved}
         variant={saved ? 'secondary' : 'primary'}
+        icon={saved ? <Ionicons name="checkmark" size={18} color={Colors.textSecondary} /> : undefined}
       />
 
       <Text style={styles.disclaimer}>{t('wizard.disclaimer')}</Text>

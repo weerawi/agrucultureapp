@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Colors, Spacing, BorderRadius, Typography } from '../theme';
 import { ForecastResult } from '../types';
@@ -104,7 +105,7 @@ const HistoryScreen = () => {
                 {commodity ? t(commodity.nameKey) : 'Unknown'}
               </Text>
               <Text style={styles.regionText}>
-                📍 {region ? t(region.nameKey) : 'Unknown'}
+                <Ionicons name="location-sharp" size={14} color={Colors.textSecondary} /> {region ? t(region.nameKey) : 'Unknown'}
               </Text>
             </View>
           </View>
@@ -186,7 +187,7 @@ const HistoryScreen = () => {
 
       {forecasts.length === 0 ? (
         <View style={styles.centerContainer}>
-          <Text style={styles.emptyIcon}>📋</Text>
+          <Ionicons name="clipboard-outline" size={48} color={Colors.textTertiary} style={{ marginBottom: Spacing.lg }} />
           <Text style={styles.emptyTitle}>{t('history.empty')}</Text>
           <Text style={styles.emptySubtitle}>
             {t('history.emptySubtitle')}

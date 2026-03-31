@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Colors, Spacing, BorderRadius, Typography } from '../theme';
 import { AppButton } from '../components/common/AppButton';
@@ -80,7 +81,7 @@ const SettingsScreen = () => {
           </Text>
           <View style={styles.card}>
             <View style={styles.locationRow}>
-              <Text style={styles.locationIcon}>📍</Text>
+              <Ionicons name="location-sharp" size={24} color={Colors.primary} />
               <View style={styles.locationInfo}>
                 <Text style={styles.locationLabel}>
                   {t('settings.detectedRegion')}
@@ -149,7 +150,7 @@ const SettingsScreen = () => {
             title={t('auth.signOut')}
             variant="outline"
             onPress={handleSignOut}
-            icon="🚪"
+            icon={<Ionicons name="log-out-outline" size={20} color={Colors.primary} />}
           />
         </View>
 

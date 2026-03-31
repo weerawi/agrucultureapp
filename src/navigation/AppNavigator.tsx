@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Colors } from '../theme';
 import { useAuthStore } from '../store/useAuthStore';
 import GlobalHeader from '../components/common/GlobalHeader';
@@ -34,20 +35,17 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 const TabIcon = ({
-  label,
+  name,
   focused,
 }: {
-  label: string;
+  name: React.ComponentProps<typeof Ionicons>['name'];
   focused: boolean;
 }) => (
-  <Text
-    style={[
-      styles.tabIcon,
-      { color: focused ? Colors.tabActive : Colors.tabInactive },
-    ]}
-  >
-    {label}
-  </Text>
+  <Ionicons
+    name={name}
+    size={22}
+    color={focused ? Colors.tabActive : Colors.tabInactive}
+  />
 );
 
 const MainTabs = () => {
@@ -74,7 +72,7 @@ const MainTabs = () => {
         options={{
           tabBarLabel: t('dashboard.home'),
           tabBarIcon: ({ focused }) => (
-            <TabIcon label="🏠" focused={focused} />
+            <TabIcon name={focused ? 'home' : 'home-outline'} focused={focused} />
           ),
         }}
       />
@@ -84,7 +82,7 @@ const MainTabs = () => {
         options={{
           tabBarLabel: t('dashboard.forecast'),
           tabBarIcon: ({ focused }) => (
-            <TabIcon label="📊" focused={focused} />
+            <TabIcon name={focused ? 'bar-chart' : 'bar-chart-outline'} focused={focused} />
           ),
         }}
       />
@@ -94,7 +92,7 @@ const MainTabs = () => {
         options={{
           tabBarLabel: t('dashboard.history'),
           tabBarIcon: ({ focused }) => (
-            <TabIcon label="📋" focused={focused} />
+            <TabIcon name={focused ? 'clipboard' : 'clipboard-outline'} focused={focused} />
           ),
         }}
       />

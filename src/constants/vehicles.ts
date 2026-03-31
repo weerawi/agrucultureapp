@@ -4,7 +4,7 @@ export const VEHICLES: Vehicle[] = [
   {
     id: 'three_wheeler',
     nameKey: 'vehicles.threeWheeler',
-    icon: '🛺',
+    icon: 'rickshaw',
     baseFee: 500,
     perKmRate: 25,
     maxCapacityKg: 300,
@@ -12,7 +12,7 @@ export const VEHICLES: Vehicle[] = [
   {
     id: 'mini_truck',
     nameKey: 'vehicles.miniTruck',
-    icon: '🚐',
+    icon: 'van-utility',
     baseFee: 1500,
     perKmRate: 40,
     maxCapacityKg: 1000,
@@ -20,7 +20,7 @@ export const VEHICLES: Vehicle[] = [
   {
     id: 'lorry_small',
     nameKey: 'vehicles.lorrySmall',
-    icon: '🚛',
+    icon: 'truck',
     baseFee: 3000,
     perKmRate: 55,
     maxCapacityKg: 3000,
@@ -28,7 +28,7 @@ export const VEHICLES: Vehicle[] = [
   {
     id: 'lorry_large',
     nameKey: 'vehicles.lorryLarge',
-    icon: '🚚',
+    icon: 'truck-delivery',
     baseFee: 5000,
     perKmRate: 70,
     maxCapacityKg: 8000,

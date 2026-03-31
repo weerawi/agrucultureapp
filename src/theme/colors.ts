@@ -6,14 +6,14 @@
 
 export const Colors = {
   // Primary
-  primaryDark: '#2D5016',
-  primary: '#4A7C28',
-  primaryLight: '#6B9B3A',
-  primaryMuted: '#A8C896',
+  primaryDark: '#005C36',
+  primary: '#007848',
+  primaryLight: '#33936D',
+  primaryMuted: '#B3D4C6',
 
   // Background
-  backgroundCream: '#FAF8F0',
-  backgroundLight: '#F5F3EB',
+  backgroundCream: '#FFFFFF',
+  backgroundLight: '#F5F5F5',
   surface: '#FFFFFF',
   surfaceElevated: '#FAFAFA',
 
@@ -56,13 +56,13 @@ export const Colors = {
   overlayLight: 'rgba(0, 0, 0, 0.3)',
 
   // Chart
-  chartLine: '#4A7C28',
-  chartArea: 'rgba(74, 124, 40, 0.15)',
-  chartAreaBorder: 'rgba(74, 124, 40, 0.3)',
+  chartLine: '#007848',
+  chartArea: 'rgba(0, 120, 72, 0.15)',
+  chartAreaBorder: 'rgba(0, 120, 72, 0.3)',
   chartGrid: '#F0F0F0',
 
   // Tab bar
-  tabActive: '#4A7C28',
+  tabActive: '#007848',
   tabInactive: '#9E9E9E',
   tabBackground: '#FFFFFF',
 

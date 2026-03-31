@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
 import { AppDropdown } from '../common/AppDropdown';
@@ -65,9 +66,9 @@ const Step1CropDetails = ({ scrollRef }: Step1Props) => {
   const regionOptions = REGIONS.map((r) => ({
     id: r.id,
     label: t(r.nameKey),
-    icon: '📍',
+    iconComponent: <Ionicons name="location-sharp" size={18} color={Colors.primary} />,
     subtitle:
-      r.id === detectedRegionId ? `📡 ${t('location.detected')}` : undefined,
+      r.id === detectedRegionId ? `${t('location.detected')}` : undefined,
   }));
 
   const handleDateChange = (_event: any, selectedDate?: Date) => {
@@ -123,16 +124,19 @@ const Step1CropDetails = ({ scrollRef }: Step1Props) => {
 
       {detectedRegionId && regionId === detectedRegionId && (
         <View style={styles.detectedBadge}>
-          <Text style={styles.detectedText}>📡 {t('location.autoDetected')}</Text>
+          <Text style={styles.detectedText}>
+            <Ionicons name="radio" size={14} color={Colors.success} /> {t('location.autoDetected')}
+          </Text>
         </View>
       )}
 
       <View style={styles.fieldGroup}>
         <Text style={styles.label}>{t('wizard.targetDate')}</Text>
         <AppButton
-          title={`📅  ${formatDate(targetDate)}`}
+          title={`  ${formatDate(targetDate)}`}
           variant="outline"
           onPress={() => setShowDatePicker(true)}
+          icon={<Ionicons name="calendar" size={18} color={Colors.primary} />}
         />
         {showDatePicker && (
           <DateTimePicker
