@@ -2,6 +2,7 @@ import {
   collection,
   addDoc,
   getDocs,
+  getDoc,
   query,
   orderBy,
   deleteDoc,
@@ -53,4 +54,25 @@ export const getForecastHistory = async (
 export const deleteForecast = async (userId: string, forecastId: string) => {
   const docRef = doc(db, 'users', userId, 'forecasts', forecastId);
   await deleteDoc(docRef);
+};
+
+const DEFAULT_YIELD_SCORE = 1;
+
+export const getDailyYieldScore = async (date: Date): Promise<number> => {
+  const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD
+  const docRef = doc(db, 'dailyYield', dateString);
+  const snapshot = await getDoc(docRef);
+
+  if (!snapshot.exists()) {
+    console.warn(`No dailyyield document found for ${dateString}, using default ${DEFAULT_YIELD_SCORE}`);
+    return DEFAULT_YIELD_SCORE;
+  }
+
+  const yieldValue = snapshot.data().yield;
+  if (typeof yieldValue !== 'number') {
+    console.warn(`Invalid yield in dailyYield/${dateString}, using default ${DEFAULT_YIELD_SCORE}`);
+    return DEFAULT_YIELD_SCORE;
+  }
+
+  return yieldValue;
 };

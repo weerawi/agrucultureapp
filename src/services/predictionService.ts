@@ -3,6 +3,7 @@ import { REGIONS } from '../constants/regions';
 import { COMMODITIES } from '../constants/commodities';
 import appMappings from '../../assets/models/app_mappings.json';
 import { loadTensorflowModel, TensorflowModel } from 'react-native-fast-tflite';
+import { getDailyYieldScore } from './firebase/firestoreService';
 
 /**
  * New model: sl_veg_price_model.tflite
@@ -19,8 +20,6 @@ import { loadTensorflowModel, TensorflowModel } from 'react-native-fast-tflite';
  * Normalisation:
  *   scaled_value = (raw_value - scaler_mean[i]) / scaler_std[i]
  */
-
-const CROP_YIELD_IMPACT_SCORE = 2; // Range: 0 (low) to 2 (high)
 
 const { regions, vegetables, scaler_mean, scaler_std } = appMappings;
 
@@ -71,7 +70,8 @@ export const buildModelInput = (
   commodityId: string,
   regionId: string,
   targetDate: Date,
-  weather: WeatherData
+  weather: WeatherData,
+  yieldScore: number
 ): number[] => {
   const regionIdx = getRegionIndex(regionId);
   const vegIdx = getVegetableIndex(commodityId);
@@ -84,10 +84,10 @@ export const buildModelInput = (
     weather.temperature,
     weather.rainfall,
     weather.humidity,
-    CROP_YIELD_IMPACT_SCORE,
+    yieldScore,
   ];
 
-  console.log(`Model raw input: Region=${regions[regionIdx]}(${regionIdx}), Veg=${vegetables[vegIdx]}(${vegIdx}), Month=${month}, Temp=${weather.temperature}, Rain=${weather.rainfall}, Humid=${weather.humidity}, Yield=${CROP_YIELD_IMPACT_SCORE}`);
+  console.log(`Model raw input: Region=${regions[regionIdx]}(${regionIdx}), Veg=${vegetables[vegIdx]}(${vegIdx}), Month=${month}, Temp=${weather.temperature}, Rain=${weather.rainfall}, Humid=${weather.humidity}, Yield=${yieldScore}`);
   return normalise(raw);
 };
 
@@ -101,7 +101,8 @@ export const predictPrice = async (
   targetDate: Date,
   weather: WeatherData
 ): Promise<number> => {
-  const inputTensor = buildModelInput(commodityId, regionId, targetDate, weather);
+  const yieldScore = await getDailyYieldScore(new Date());
+  const inputTensor = buildModelInput(commodityId, regionId, targetDate, weather, yieldScore);
   console.log('Model input tensor (7 features, normalised):', inputTensor);
 
   const model = await getModel();
