@@ -65,6 +65,8 @@
     "estimatedRevenue": "Estimated Revenue",
     "weatherNote": "Weather data is automatically fetched from Open-Meteo for the selected region and date.",
     "findingMarkets": "Finding nearest markets...",
+    "searchPlace": "Search place in Sri Lanka...",
+    "searchedLocation": "Searched Location",
     "nearestSpots": "Nearest Selling Spots",
     "noSpotsFound": "Enable location to find nearest markets.",
     "selectVehicle": "Select Vehicle",
@@ -194,12 +196,9 @@
     "active": "Active",
     "inactive": "Inactive",
     "about": "About",
-    "version": "Version",
-    "developer": "Developer",
-    "dataSource": "Data Source",
     "signOutTitle": "Sign Out",
     "signOutConfirm": "Are you sure you want to sign out?",
-    "copyright": "© 2024 AgriPrice Digital Support Systems"
+    "copyright": "© 2026 AgriPrice Digital Support Systems"
   },
   "common": {
     "loading": "Loading...",

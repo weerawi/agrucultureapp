@@ -20,6 +20,7 @@ interface WizardState {
 
   // Step 3: Market & Transport
   userLocation: { lat: number; lng: number } | null;
+  referenceLocation: { lat: number; lng: number } | null;
   nearestSpots: SellingSpotWithDistance[];
   nearestMarketplaces: MarketplaceWithDistance[];
   selectedSpotId: string;
@@ -52,6 +53,7 @@ interface WizardState {
 
   // Actions — Step 3
   setUserLocation: (loc: { lat: number; lng: number }) => void;
+  setReferenceLocation: (loc: { lat: number; lng: number }) => void;
   setNearestSpots: (spots: SellingSpotWithDistance[]) => void;
   setNearestMarketplaces: (mps: MarketplaceWithDistance[]) => void;
   setSelectedSpotId: (id: string) => void;
@@ -76,6 +78,7 @@ const initialState = {
   isLoadingStep2: false,
   step2Error: null,
   userLocation: null,
+  referenceLocation: null,
   nearestSpots: [],
   nearestMarketplaces: [],
   selectedSpotId: '',
@@ -106,6 +109,7 @@ export const useForecastStore = create<WizardState>((set) => ({
   setStep2Error: (step2Error) => set({ step2Error }),
 
   setUserLocation: (userLocation) => set({ userLocation }),
+  setReferenceLocation: (referenceLocation) => set({ referenceLocation }),
   setNearestSpots: (nearestSpots) => set({ nearestSpots }),
   setNearestMarketplaces: (nearestMarketplaces) => set({ nearestMarketplaces }),
   setSelectedSpotId: (selectedSpotId) => set({ selectedSpotId }),

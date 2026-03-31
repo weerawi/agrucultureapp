@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -121,29 +121,6 @@ const SettingsScreen = () => {
           </View>
         </View>
 
-        {/* About Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>
-            {t('settings.about').toUpperCase()}
-          </Text>
-          <View style={styles.card}>
-            <View style={styles.aboutRow}>
-              <Text style={styles.aboutLabel}>{t('settings.version')}</Text>
-              <Text style={styles.aboutValue}>1.0.0</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.aboutRow}>
-              <Text style={styles.aboutLabel}>{t('settings.developer')}</Text>
-              <Text style={styles.aboutValue}>AgriPrice DSS Team</Text>
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.aboutRow}>
-              <Text style={styles.aboutLabel}>{t('settings.dataSource')}</Text>
-              <Text style={styles.aboutValue}>Mock Data (v1)</Text>
-            </View>
-          </View>
-        </View>
-
         {/* Sign Out */}
         <View style={styles.section}>
           <AppButton
@@ -154,8 +131,19 @@ const SettingsScreen = () => {
           />
         </View>
 
-        {/* Copyright */}
-        <Text style={styles.copyright}>{t('settings.copyright')}</Text>
+        {/* App Branding Footer */}
+        <View style={styles.brandingFooter}>
+          <Image
+            source={require('../../assets/agriprice_logo-removebg.png')}
+            style={styles.brandingLogo}
+            resizeMode="contain"
+          />
+          <Text style={styles.brandingName}>AgriPrice DSS</Text>
+          <View style={styles.versionBadge}>
+            <Text style={styles.versionText}>v1.0.0</Text>
+          </View>
+          <Text style={styles.copyright}>{t('settings.copyright')}</Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -240,30 +228,38 @@ const styles = StyleSheet.create({
     ...Typography.small,
     fontWeight: '700',
   },
-  aboutRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  brandingFooter: {
     alignItems: 'center',
-    paddingVertical: Spacing.sm,
+    paddingVertical: Spacing.xl,
   },
-  aboutLabel: {
-    ...Typography.body,
-    color: Colors.textSecondary,
+  brandingLogo: {
+    width: 48,
+    height: 48,
+    marginBottom: Spacing.sm,
   },
-  aboutValue: {
-    ...Typography.captionBold,
-    color: Colors.textPrimary,
+  brandingName: {
+    ...Typography.bodyBold,
+    color: Colors.primaryDark,
+    fontSize: 16,
+    marginBottom: Spacing.xs,
   },
-  divider: {
-    height: 1,
-    backgroundColor: Colors.borderLight,
+  versionBadge: {
+    backgroundColor: Colors.primaryMuted + '30',
+    paddingHorizontal: Spacing.md,
+    paddingVertical: 3,
+    borderRadius: BorderRadius.full,
+    marginBottom: Spacing.md,
+  },
+  versionText: {
+    ...Typography.small,
+    color: Colors.primaryDark,
+    fontWeight: '600',
   },
   copyright: {
     ...Typography.small,
     color: Colors.textTertiary,
     textAlign: 'center',
     letterSpacing: 1,
-    marginTop: Spacing.lg,
   },
 });
 

@@ -2,14 +2,14 @@ import { ExpoConfig, ConfigContext } from 'expo/config';
 
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
-  name: 'agrucultureapp',
+  name: 'AgriPrice DSS',
   slug: 'agrucultureapp',
   version: '1.0.0',
   orientation: 'portrait',
-  icon: './assets/icon.png',
+  icon: './assets/agriprice_logo-removebg.png',
   userInterfaceStyle: 'light',
   splash: {
-    image: './assets/splash-icon.png',
+    image: './assets/agriprice_logo-removebg.png',
     resizeMode: 'contain',
     backgroundColor: '#ffffff',
   },
@@ -18,7 +18,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     adaptiveIcon: {
-      foregroundImage: './assets/adaptive-icon.png',
+      foregroundImage: './assets/agriprice_logo-removebg.png',
       backgroundColor: '#ffffff',
     },
     edgeToEdgeEnabled: true,

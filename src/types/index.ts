@@ -55,6 +55,7 @@ export interface Vehicle {
   icon: string;
   baseFee: number;
   perKmRate: number;
+  includedKm: number;
   maxCapacityKg: number;
 }
 

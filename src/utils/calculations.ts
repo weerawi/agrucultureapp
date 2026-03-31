@@ -1,7 +1,8 @@
 import { Vehicle, ProfitAnalysis, Recommendation } from '../types';
 
 /**
- * Calculate transport cost = (baseFee + perKmRate × distance) × trips
+ * Calculate transport cost using tiered pricing:
+ * cost = (baseFee + max(0, distance - includedKm) * perKmRate) * trips
  */
 export const calculateTransportCost = (
   vehicle: Vehicle,
@@ -9,7 +10,8 @@ export const calculateTransportCost = (
   quantityKg: number
 ): { cost: number; tripsNeeded: number } => {
   const tripsNeeded = Math.ceil(quantityKg / vehicle.maxCapacityKg);
-  const singleTripCost = vehicle.baseFee + vehicle.perKmRate * distanceKm;
+  const extraKm = Math.max(0, distanceKm - vehicle.includedKm);
+  const singleTripCost = vehicle.baseFee + extraKm * vehicle.perKmRate;
   return {
     cost: Math.round(singleTripCost * tripsNeeded * 100) / 100,
     tripsNeeded,

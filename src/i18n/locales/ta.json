@@ -65,6 +65,8 @@
     "estimatedRevenue": "மதிப்பிடப்பட்ட வருவாய்",
     "weatherNote": "தேர்ந்தெடுக்கப்பட்ட பிராந்தியம் மற்றும் தேதிக்கு Open-Meteo இலிருந்து வானிலை தரவு தானாகப் பெறப்படுகிறது.",
     "findingMarkets": "அருகிலுள்ள சந்தைகளைத் தேடுகிறது...",
+    "searchPlace": "இலங்கையில் இடத்தைத் தேடுங்கள்...",
+    "searchedLocation": "தேடிய இடம்",
     "nearestSpots": "அருகிலுள்ள விற்பனை இடங்கள்",
     "noSpotsFound": "அருகிலுள்ள சந்தைகளைக் கண்டறிய இருப்பிடத்தை இயக்கவும்.",
     "selectVehicle": "வாகனத்தைத் தேர்ந்தெடுக்கவும்",
@@ -194,12 +196,9 @@
     "active": "செயல்படுத்தி",
     "inactive": "செயல்படுத்தவில்லை",
     "about": "பற்றி",
-    "version": "பதிப்பு",
-    "developer": "உருவாக்குநர்",
-    "dataSource": "தரவு மூலம்",
     "signOutTitle": "வெளியேறு",
     "signOutConfirm": "நீங்கள் வெளியேற விரும்புகிறீர்களா?",
-    "copyright": "© 2024 AgriPrice Digital Support Systems"
+    "copyright": "© 2026 AgriPrice Digital Support Systems"
   },
   "common": {
     "loading": "ஏற்றுகிறது...",

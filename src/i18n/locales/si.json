@@ -65,6 +65,8 @@
     "estimatedRevenue": "ඇස්තමේන්තුගත ආදායම",
     "weatherNote": "තෝරාගත් ප්‍රදේශය සහ දිනය සඳහා Open-Meteo වෙතින් කාලගුණ දත්ත ස්වයංක්‍රීයව ලබා ගනී.",
     "findingMarkets": "ආසන්නතම වෙළඳපොළ සෙවීම...",
+    "searchPlace": "ශ්‍රී ලංකාවේ ස්ථානයක් සොයන්න...",
+    "searchedLocation": "සොයා ගත් ස්ථානය",
     "nearestSpots": "ආසන්නතම විකුණුම් ස්ථාන",
     "noSpotsFound": "ආසන්නතම වෙළඳපොළ සොයා ගැනීමට ස්ථානය සබල කරන්න.",
     "selectVehicle": "වාහනය තෝරන්න",
@@ -194,12 +196,9 @@
     "active": "සක්‍රියයි",
     "inactive": "අක්‍රියයි",
     "about": "ගැන",
-    "version": "අනුවාදය",
-    "developer": "සංවර්ධකයා",
-    "dataSource": "දත්ත මූලාශ්‍රය",
     "signOutTitle": "ඉවත් වන්න",
     "signOutConfirm": "ඔබට ඉවත් වීමට අවශ්‍ය බව විශ්වාසද?",
-    "copyright": "© 2024 AgriPrice Digital Support Systems"
+    "copyright": "© 2026 AgriPrice Digital Support Systems"
   },
   "common": {
     "loading": "පූරණය වෙමින්...",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,9 @@ import {
   ActivityIndicator,
   Platform,
   Dimensions,
+  TextInput,
+  FlatList,
+  Keyboard,
 } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +19,9 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
 import { useForecastStore } from '../../store/useForecastStore';
+import { useSettingsStore } from '../../store/useSettingsStore';
 import { VEHICLES } from '../../constants/vehicles';
+import { REGIONS } from '../../constants/regions';
 import { MarketplaceWithDistance } from '../../types';
 import { findNearestMarketplaces, suggestVehicleId } from '../../services/marketplaceService';
 import { calculateTransportCost, formatCurrency } from '../../utils/calculations';
@@ -24,55 +29,154 @@ import { calculateTransportCost, formatCurrency } from '../../utils/calculations
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const MAP_HEIGHT = 220;
 
+const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
+
 const Step3MarketTransport = () => {
   const { t } = useTranslation();
   const mapRef = useRef<MapView>(null);
   const [vehicleDropdownOpen, setVehicleDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
+  const [suggestions, setSuggestions] = useState<Array<{ place_id: string; description: string; lat: number; lng: number }>>([]);
+  const [searchedPlace, setSearchedPlace] = useState<{ lat: number; lng: number; name: string } | null>(null);
+  const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { detectedRegionId } = useSettingsStore();
 
   const {
     quantityKg,
+    regionId,
     userLocation,
+    referenceLocation,
     nearestMarketplaces,
     selectedMarketplaceId,
     vehicleId,
     isLoadingStep3,
     setUserLocation,
+    setReferenceLocation,
     setNearestMarketplaces,
     setSelectedMarketplaceId,
     setVehicleId,
     setIsLoadingStep3,
   } = useForecastStore();
 
+  const loadMarketplacesFrom = useCallback(async (coords: { lat: number; lng: number }) => {
+    const mps = await findNearestMarketplaces(coords.lat, coords.lng, 5);
+    setNearestMarketplaces(mps);
+    setReferenceLocation(coords);
+    if (mps.length > 0) {
+      setSelectedMarketplaceId(mps[0].id);
+    }
+  }, []);
+
   useEffect(() => {
     const loadMarketplaces = async () => {
       if (nearestMarketplaces.length > 0) return;
       setIsLoadingStep3(true);
       try {
+        // Get user's GPS location
         const { status } = await Location.requestForegroundPermissionsAsync();
+        let gpsCoords: { lat: number; lng: number } | null = null;
         if (status === 'granted') {
           const loc = await Location.getCurrentPositionAsync({
             accuracy: Location.Accuracy.Balanced,
           });
-          const coords = { lat: loc.coords.latitude, lng: loc.coords.longitude };
-          setUserLocation(coords);
+          gpsCoords = { lat: loc.coords.latitude, lng: loc.coords.longitude };
+          setUserLocation(gpsCoords);
+        }
 
-          const mps = await findNearestMarketplaces(coords.lat, coords.lng, 5);
-          setNearestMarketplaces(mps);
-
-          if (mps.length > 0 && !selectedMarketplaceId) {
-            setSelectedMarketplaceId(mps[0].id);
+        // Determine reference location: selected region center if different from detected, else GPS
+        let refCoords = gpsCoords;
+        if (regionId && regionId !== detectedRegionId) {
+          const selectedRegion = REGIONS.find((r) => r.id === regionId);
+          if (selectedRegion) {
+            refCoords = { lat: selectedRegion.lat, lng: selectedRegion.lng };
           }
+        }
 
-          // Auto-suggest vehicle based on harvest weight
-          if (!vehicleId) {
-            setVehicleId(suggestVehicleId(quantityKg));
-          }
+        if (refCoords) {
+          await loadMarketplacesFrom(refCoords);
+        }
+
+        // Auto-suggest vehicle based on harvest weight
+        if (!vehicleId) {
+          setVehicleId(suggestVehicleId(quantityKg));
         }
       } catch {}
       setIsLoadingStep3(false);
     };
     loadMarketplaces();
   }, []);
+
+  const fetchSuggestions = useCallback((text: string) => {
+    if (searchTimeout.current) clearTimeout(searchTimeout.current);
+    if (text.trim().length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    searchTimeout.current = setTimeout(async () => {
+      try {
+        const url = `${NOMINATIM_BASE}/search?q=${encodeURIComponent(text)}&countrycodes=lk&format=json&limit=5&addressdetails=0`;
+        const res = await fetch(url, { headers: { 'User-Agent': 'AgriPriceDSS/1.0' } });
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setSuggestions(data.map((p: any) => ({ place_id: String(p.place_id), description: p.display_name, lat: parseFloat(p.lat), lng: parseFloat(p.lon) })));
+        }
+      } catch {
+        setSuggestions([]);
+      }
+    }, 500);
+  }, []);
+
+  const handleSearchTextChange = (text: string) => {
+    setSearchQuery(text);
+    fetchSuggestions(text);
+  };
+
+  const selectSuggestion = async (item: { place_id: string; description: string; lat: number; lng: number }) => {
+    Keyboard.dismiss();
+    setSuggestions([]);
+    setSearchQuery(item.description);
+    setIsSearching(true);
+    const coords = { lat: item.lat, lng: item.lng };
+    setSearchedPlace({ lat: item.lat, lng: item.lng, name: item.description });
+    await loadMarketplacesFrom(coords);
+    mapRef.current?.animateToRegion({
+      latitude: item.lat,
+      longitude: item.lng,
+      latitudeDelta: 0.5,
+      longitudeDelta: 0.5,
+    }, 500);
+    setIsSearching(false);
+  };
+
+  const handleSearchPlace = async () => {
+    const query = searchQuery.trim();
+    if (!query) return;
+    Keyboard.dismiss();
+    setSuggestions([]);
+    setIsSearching(true);
+    try {
+      const url = `${NOMINATIM_BASE}/search?q=${encodeURIComponent(query)}&countrycodes=lk&format=json&limit=1`;
+      const res = await fetch(url, { headers: { 'User-Agent': 'AgriPriceDSS/1.0' } });
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lng = parseFloat(data[0].lon);
+        const coords = { lat, lng };
+        setSearchedPlace({ lat, lng, name: data[0].display_name });
+        await loadMarketplacesFrom(coords);
+        mapRef.current?.animateToRegion({
+          latitude: lat,
+          longitude: lng,
+          latitudeDelta: 0.5,
+          longitudeDelta: 0.5,
+        }, 500);
+      }
+    } catch {}
+    setIsSearching(false);
+  };
+
+  const mapCenter = referenceLocation || userLocation;
 
   const selectedMp = nearestMarketplaces.find((m) => m.id === selectedMarketplaceId);
   const selectedVehicle = VEHICLES.find((v) => v.id === vehicleId);
@@ -102,21 +206,65 @@ const Step3MarketTransport = () => {
       <Text style={styles.subheading}>{t('wizard.step3Desc')}</Text>
 
       {/* Map View */}
-      {userLocation && nearestMarketplaces.length > 0 ? (
+      {mapCenter && nearestMarketplaces.length > 0 ? (
         <View style={styles.mapContainer}>
+          <View style={styles.searchRow}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder={t('wizard.searchPlace')}
+              value={searchQuery}
+              onChangeText={handleSearchTextChange}
+              onSubmitEditing={handleSearchPlace}
+              returnKeyType="search"
+            />
+            <TouchableOpacity style={styles.searchButton} onPress={handleSearchPlace} disabled={isSearching}>
+              <Text style={styles.searchButtonText}>{isSearching ? '...' : '🔍'}</Text>
+            </TouchableOpacity>
+          </View>
+          {suggestions.length > 0 && (
+            <View style={styles.suggestionsContainer}>
+              <FlatList
+                data={suggestions}
+                keyExtractor={(item) => item.place_id}
+                keyboardShouldPersistTaps="handled"
+                style={styles.suggestionsList}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.suggestionItem}
+                    onPress={() => selectSuggestion(item)}
+                  >
+                    <Text style={styles.suggestionText} numberOfLines={1}>{item.description}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          )}
           <MapView
             ref={mapRef}
             style={styles.map}
             provider={Platform.OS === 'android' ? PROVIDER_GOOGLE : undefined}
             initialRegion={{
-              latitude: userLocation.lat,
-              longitude: userLocation.lng,
+              latitude: mapCenter.lat,
+              longitude: mapCenter.lng,
               latitudeDelta: 0.8,
               longitudeDelta: 0.8,
             }}
             showsUserLocation
             showsMyLocationButton={false}
           >
+            {searchedPlace && (
+              <Marker
+                coordinate={{ latitude: searchedPlace.lat, longitude: searchedPlace.lng }}
+                pinColor={Colors.accentGold}
+              >
+                <Callout>
+                  <View style={styles.calloutContainer}>
+                    <Text style={styles.calloutTitle}>{searchedPlace.name}</Text>
+                    <Text style={styles.calloutSub}>{t('wizard.searchedLocation')}</Text>
+                  </View>
+                </Callout>
+              </Marker>
+            )}
             {nearestMarketplaces.map((mp) => {
               const isSelected = mp.id === selectedMarketplaceId;
               return (
@@ -322,6 +470,58 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.lg,
     borderWidth: 1,
     borderColor: Colors.border,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  searchInput: {
+    flex: 1,
+    ...Typography.body,
+    backgroundColor: Colors.backgroundLight,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    fontSize: 13,
+  },
+  searchButton: {
+    marginLeft: Spacing.xs,
+    backgroundColor: Colors.primary,
+    borderRadius: BorderRadius.md,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xs,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  searchButtonText: {
+    fontSize: 16,
+  },
+  suggestionsContainer: {
+    maxHeight: 150,
+    backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  suggestionsList: {
+    maxHeight: 150,
+  },
+  suggestionItem: {
+    paddingHorizontal: Spacing.md,
+    paddingVertical: Spacing.sm,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: Colors.borderLight,
+  },
+  suggestionText: {
+    ...Typography.caption,
+    color: Colors.textPrimary,
+    fontSize: 13,
   },
   map: {
     width: '100%',
