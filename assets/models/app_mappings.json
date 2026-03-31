@@ -1,0 +1,7 @@
+{
+"regions": ["Ampara", "Anuradhapura", "Badulla", "Batticaloa", "Colombo", "Galle", "Gampaha", "Hambantota", "Jaffna", "Kalutara", "Kandy", "Kegalle", "Kilinochchi", "Kurunegala", "Mannar", "Matale", "Matara", "Monaragala", "Mullaitivu", "Nuwara Eliya", "Polonnaruwa", "Puttalam", "Ratnapura", "Trincomalee", "Vavuniya"], 
+"vegetables": ["Asiatic Pennywort", "Beetroot", "Bitter Melon", "Breadfruit", "Brinjal", "Cabbage", "Carrot", "Drumsticks", "Jackfruit", "Knol-Khol", "Leeks", "Long Purple Eggplant", "Manioc", "Onion", "Pennywort", "Potato", "Pumpkin", "Red Spinach", "Taro", "Winged Bean"], 
+"feature_order": ["Region_ID", "Veg_ID", "Month", "Temperature (\u00b0C)", "Rainfall (mm)", "Humidity (%)", "Crop Yield Impact Score"], 
+"scaler_mean": [11.986567178530564, 9.501024048308157, 6.522408869316051, 29.168371811267413, 181.85612457812095, 72.98658160174618, 1.2106738526331984], 
+"scaler_std": [7.213606447904805, 5.765756742722228, 3.451698913293734, 5.078604846679002, 116.35373506566887, 12.763102762612748, 0.4339673098291181]
+}
