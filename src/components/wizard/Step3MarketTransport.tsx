@@ -23,7 +23,7 @@ import { useSettingsStore } from '../../store/useSettingsStore';
 import { VEHICLES } from '../../constants/vehicles';
 import { REGIONS } from '../../constants/regions';
 import { MarketplaceWithDistance } from '../../types';
-import { findNearestMarketplaces, suggestVehicleId } from '../../services/marketplaceService';
+import { findNearestMarketplaces, fetchMarketplaces, suggestVehicleId } from '../../services/marketplaceService';
 import { calculateTransportCost, formatCurrency } from '../../utils/calculations';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -36,8 +36,9 @@ const Step3MarketTransport = () => {
   const mapRef = useRef<MapView>(null);
   const [vehicleDropdownOpen, setVehicleDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMapReady, setIsMapReady] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
-  const [suggestions, setSuggestions] = useState<Array<{ place_id: string; description: string; lat: number; lng: number }>>([]);
+  const [suggestions, setSuggestions] = useState<Array<{ place_id: string; description: string; lat: number; lng: number; type: 'place' | 'marketplace' }>>([]);
   const [searchedPlace, setSearchedPlace] = useState<{ lat: number; lng: number; name: string } | null>(null);
   const searchTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { detectedRegionId } = useSettingsStore();
@@ -58,6 +59,11 @@ const Step3MarketTransport = () => {
     setVehicleId,
     setIsLoadingStep3,
   } = useForecastStore();
+
+  // Determine if the user selected a different region from their current location
+  const isRemoteRegion = regionId && regionId !== detectedRegionId;
+  const selectedRegion = REGIONS.find((r) => r.id === regionId);
+  const regionDisplayName = selectedRegion ? t(selectedRegion.nameKey) : '';
 
   const loadMarketplacesFrom = useCallback(async (coords: { lat: number; lng: number }) => {
     const mps = await findNearestMarketplaces(coords.lat, coords.lng, 5);
@@ -86,11 +92,10 @@ const Step3MarketTransport = () => {
 
         // Determine reference location: selected region center if different from detected, else GPS
         let refCoords = gpsCoords;
-        if (regionId && regionId !== detectedRegionId) {
-          const selectedRegion = REGIONS.find((r) => r.id === regionId);
-          if (selectedRegion) {
-            refCoords = { lat: selectedRegion.lat, lng: selectedRegion.lng };
-          }
+        if (isRemoteRegion && selectedRegion) {
+          refCoords = { lat: selectedRegion.lat, lng: selectedRegion.lng };
+          // Pre-fill search bar with the selected region's town name
+          setSearchQuery(selectedRegion.name);
         }
 
         if (refCoords) {
@@ -115,12 +120,36 @@ const Step3MarketTransport = () => {
     }
     searchTimeout.current = setTimeout(async () => {
       try {
+        // Search marketplace names locally
+        const allMarketplaces = await fetchMarketplaces();
+        const lowerText = text.toLowerCase();
+        const mpMatches = allMarketplaces
+          .filter((mp) => mp.name.toLowerCase().includes(lowerText) || mp.district.toLowerCase().includes(lowerText))
+          .slice(0, 3)
+          .map((mp) => ({
+            place_id: `mp_${mp.id}`,
+            description: `${mp.name} — ${mp.district}, ${mp.province}`,
+            lat: mp.latitude,
+            lng: mp.longitude,
+            type: 'marketplace' as const,
+          }));
+
+        // Search places via Nominatim
         const url = `${NOMINATIM_BASE}/search?q=${encodeURIComponent(text)}&countrycodes=lk&format=json&limit=5&addressdetails=0`;
         const res = await fetch(url, { headers: { 'User-Agent': 'AgriPriceDSS/1.0' } });
         const data = await res.json();
-        if (Array.isArray(data)) {
-          setSuggestions(data.map((p: any) => ({ place_id: String(p.place_id), description: p.display_name, lat: parseFloat(p.lat), lng: parseFloat(p.lon) })));
-        }
+        const placeMatches = Array.isArray(data)
+          ? data.map((p: any) => ({
+              place_id: String(p.place_id),
+              description: p.display_name,
+              lat: parseFloat(p.lat),
+              lng: parseFloat(p.lon),
+              type: 'place' as const,
+            }))
+          : [];
+
+        // Show marketplace matches first, then place matches
+        setSuggestions([...mpMatches, ...placeMatches]);
       } catch {
         setSuggestions([]);
       }
@@ -205,20 +234,34 @@ const Step3MarketTransport = () => {
       <Text style={styles.heading}>{t('wizard.step3Title')}</Text>
       <Text style={styles.subheading}>{t('wizard.step3Desc')}</Text>
 
+      {/* Region info banner — shows when growing region differs from current location */}
+      {isRemoteRegion && regionDisplayName ? (
+        <View style={styles.regionBanner}>
+          <Ionicons name="information-circle" size={18} color={Colors.primary} />
+          <Text style={styles.regionBannerText}>
+            {t('wizard.showingMarketsFor', { region: regionDisplayName })}
+          </Text>
+        </View>
+      ) : null}
+
       {/* Map View */}
       {mapCenter && nearestMarketplaces.length > 0 ? (
         <View style={styles.mapContainer}>
           <View style={styles.searchRow}>
             <TextInput
               style={styles.searchInput}
-              placeholder={t('wizard.searchPlace')}
+              placeholder={t('wizard.searchPlaceOrShop')}
               value={searchQuery}
               onChangeText={handleSearchTextChange}
               onSubmitEditing={handleSearchPlace}
               returnKeyType="search"
             />
             <TouchableOpacity style={styles.searchButton} onPress={handleSearchPlace} disabled={isSearching}>
-              <Text style={styles.searchButtonText}>{isSearching ? '...' : '🔍'}</Text>
+              {isSearching ? (
+                <ActivityIndicator size="small" color={Colors.white} />
+              ) : (
+                <Ionicons name="search" size={20} color={Colors.white} />
+              )}
             </TouchableOpacity>
           </View>
           {suggestions.length > 0 && (
@@ -233,7 +276,15 @@ const Step3MarketTransport = () => {
                     style={styles.suggestionItem}
                     onPress={() => selectSuggestion(item)}
                   >
-                    <Text style={styles.suggestionText} numberOfLines={1}>{item.description}</Text>
+                    <View style={styles.suggestionRow}>
+                      <Ionicons
+                        name={item.type === 'marketplace' ? 'storefront-outline' : 'location-outline'}
+                        size={16}
+                        color={item.type === 'marketplace' ? Colors.primary : Colors.textTertiary}
+                        style={styles.suggestionIcon}
+                      />
+                      <Text style={styles.suggestionText} numberOfLines={1}>{item.description}</Text>
+                    </View>
                   </TouchableOpacity>
                 )}
               />
@@ -251,6 +302,7 @@ const Step3MarketTransport = () => {
             }}
             showsUserLocation
             showsMyLocationButton={false}
+            onMapReady={() => setIsMapReady(true)}
           >
             {searchedPlace && (
               <Marker
@@ -286,6 +338,12 @@ const Step3MarketTransport = () => {
               );
             })}
           </MapView>
+          {!isMapReady && (
+            <View style={styles.mapLoadingOverlay}>
+              <ActivityIndicator size="large" color={Colors.primary} />
+              <Text style={styles.mapLoadingText}>{t('wizard.loadingMap')}</Text>
+            </View>
+          )}
         </View>
       ) : (
         <View style={styles.emptyBox}>
@@ -457,6 +515,25 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     marginBottom: Spacing.lg,
   },
+
+  // Region info banner
+  regionBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primaryMuted + '30',
+    borderRadius: BorderRadius.md,
+    borderWidth: 1,
+    borderColor: Colors.primaryMuted,
+    padding: Spacing.sm,
+    marginBottom: Spacing.md,
+    gap: Spacing.xs,
+  },
+  regionBannerText: {
+    ...Typography.caption,
+    color: Colors.primaryDark,
+    flex: 1,
+  },
+
   loadingText: {
     ...Typography.body,
     color: Colors.textSecondary,
@@ -522,10 +599,29 @@ const styles = StyleSheet.create({
     ...Typography.caption,
     color: Colors.textPrimary,
     fontSize: 13,
+    flex: 1,
+  },
+  suggestionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  suggestionIcon: {
+    marginRight: Spacing.xs,
   },
   map: {
     width: '100%',
     height: MAP_HEIGHT,
+  },
+  mapLoadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: Colors.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  mapLoadingText: {
+    ...Typography.caption,
+    color: Colors.textSecondary,
+    marginTop: Spacing.sm,
   },
   calloutContainer: {
     padding: Spacing.xs,

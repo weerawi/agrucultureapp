@@ -3,6 +3,7 @@ import {
   View,
   Text,
   TextInput,
+  Image,
   StyleSheet,
   Platform,
   ScrollView,
@@ -61,6 +62,15 @@ const Step1CropDetails = ({ scrollRef }: Step1Props) => {
     id: c.id,
     label: t(c.nameKey),
     icon: c.icon,
+    ...(c.imageUrl && {
+      iconComponent: (
+        <Image
+          source={{ uri: c.imageUrl }}
+          style={{ width: 24, height: 24 }}
+          resizeMode="contain"
+        />
+      ),
+    }),
   }));
 
   const regionOptions = REGIONS.map((r) => ({
