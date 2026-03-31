@@ -8,12 +8,14 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
 
 interface DropdownOption {
   id: string;
   label: string;
   icon?: string;
+  iconComponent?: React.ReactNode;
   subtitle?: string;
 }
 
@@ -46,7 +48,7 @@ export const AppDropdown: React.FC<AppDropdownProps> = ({
         activeOpacity={0.7}
       >
         <View style={styles.triggerContent}>
-          {selected?.icon && <Text style={styles.icon}>{selected.icon}</Text>}
+          {selected?.iconComponent ? selected.iconComponent : selected?.icon ? <Text style={styles.icon}>{selected.icon}</Text> : null}
           <Text
             style={[
               styles.triggerText,
@@ -56,7 +58,7 @@ export const AppDropdown: React.FC<AppDropdownProps> = ({
             {selected ? selected.label : placeholder}
           </Text>
         </View>
-        <Text style={styles.chevron}>▼</Text>
+        <Ionicons name="chevron-down" size={16} color={Colors.textTertiary} />
       </TouchableOpacity>
 
       <Modal
@@ -74,7 +76,7 @@ export const AppDropdown: React.FC<AppDropdownProps> = ({
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>{label || placeholder}</Text>
               <TouchableOpacity onPress={() => setIsOpen(false)}>
-                <Text style={styles.closeButton}>✕</Text>
+                <Ionicons name="close" size={22} color={Colors.textSecondary} style={{ padding: Spacing.sm }} />
               </TouchableOpacity>
             </View>
             <FlatList
@@ -91,7 +93,7 @@ export const AppDropdown: React.FC<AppDropdownProps> = ({
                     setIsOpen(false);
                   }}
                 >
-                  {item.icon && <Text style={styles.optionIcon}>{item.icon}</Text>}
+                  {item.iconComponent ? item.iconComponent : item.icon ? <Text style={styles.optionIcon}>{item.icon}</Text> : null}
                   <View style={styles.optionTextContainer}>
                     <Text
                       style={[
@@ -106,7 +108,7 @@ export const AppDropdown: React.FC<AppDropdownProps> = ({
                     )}
                   </View>
                   {item.id === selectedId && (
-                    <Text style={styles.checkmark}>✓</Text>
+                    <Ionicons name="checkmark" size={20} color={Colors.primary} />
                   )}
                 </TouchableOpacity>
               )}

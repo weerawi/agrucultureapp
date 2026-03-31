@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { Colors, Spacing, BorderRadius, Typography } from '../theme';
 import { AppButton } from '../components/common/AppButton';
@@ -122,13 +124,13 @@ const DashboardScreen = () => {
         {/* Welcome Section */}
         <View style={styles.welcomeSection}>
           <Text style={styles.greeting}>{getGreeting()}</Text>
-          <Text style={styles.userName}>{displayName} 👋</Text>
+          <Text style={styles.userName}>{displayName}</Text>
         </View>
 
         {/* Location Card */}
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardIcon}>📍</Text>
+            <Ionicons name="location-sharp" size={20} color={Colors.primary} style={{ marginRight: Spacing.sm }} />
             <Text style={styles.cardTitle}>{t('dashboard.currentLocation')}</Text>
           </View>
           <Text style={styles.locationName}>
@@ -140,7 +142,7 @@ const DashboardScreen = () => {
         {/* Weather Card */}
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardIcon}>☀️</Text>
+            <Ionicons name="sunny" size={20} color={Colors.primary} style={{ marginRight: Spacing.sm }} />
             <Text style={styles.cardTitle}>{t('dashboard.currentWeather')}</Text>
           </View>
 
@@ -150,17 +152,17 @@ const DashboardScreen = () => {
             <>
               <View style={styles.weatherGrid}>
                 <View style={styles.weatherItem}>
-                  <Text style={styles.weatherEmoji}>🌡️</Text>
+                  <MaterialCommunityIcons name="thermometer" size={24} color={Colors.error} />
                   <Text style={styles.weatherValue}>{weather.temperature}°C</Text>
                   <Text style={styles.weatherLabel}>{t('wizard.temperature')}</Text>
                 </View>
                 <View style={styles.weatherItem}>
-                  <Text style={styles.weatherEmoji}>💧</Text>
+                  <Ionicons name="water" size={24} color={Colors.info} />
                   <Text style={styles.weatherValue}>{weather.humidity}%</Text>
                   <Text style={styles.weatherLabel}>{t('wizard.humidity')}</Text>
                 </View>
                 <View style={styles.weatherItem}>
-                  <Text style={styles.weatherEmoji}>🌧️</Text>
+                  <Ionicons name="rainy" size={24} color={Colors.info} />
                   <Text style={styles.weatherValue}>{weather.rainfall} mm</Text>
                   <Text style={styles.weatherLabel}>{t('wizard.rainfall')}</Text>
                 </View>
@@ -175,7 +177,7 @@ const DashboardScreen = () => {
         {/* Seasonal Tips Card */}
         <View style={styles.card}>
           <View style={styles.cardHeader}>
-            <Text style={styles.cardIcon}>🌱</Text>
+            <MaterialCommunityIcons name="leaf" size={20} color={Colors.primary} style={{ marginRight: Spacing.sm }} />
             <Text style={styles.cardTitle}>{t('dashboard.seasonalTips')}</Text>
           </View>
           {getSeasonalTips().map((tip, index) => (

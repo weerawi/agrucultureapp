@@ -11,6 +11,8 @@ import {
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useTranslation } from 'react-i18next';
 import * as Location from 'expo-location';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
 import { useForecastStore } from '../../store/useForecastStore';
@@ -163,7 +165,7 @@ const Step3MarketTransport = () => {
                   {mp.name}
                 </Text>
                 <Text style={styles.spotType}>
-                  📍 {mp.district}, {mp.province}
+                  <Ionicons name="location-sharp" size={14} color={Colors.textTertiary} /> {mp.district}, {mp.province}
                 </Text>
               </View>
             </View>
@@ -190,7 +192,7 @@ const Step3MarketTransport = () => {
         <View style={styles.dropdownLeft}>
           {selectedVehicle ? (
             <>
-              <Text style={styles.vehicleIcon}>{selectedVehicle.icon}</Text>
+              <MaterialCommunityIcons name={selectedVehicle.icon as any} size={24} color={Colors.primaryDark} />
               <View>
                 <Text style={styles.dropdownTriggerText}>
                   {t(selectedVehicle.nameKey)}
@@ -198,7 +200,7 @@ const Step3MarketTransport = () => {
                 <Text style={styles.vehicleCapacity}>
                   Max: {selectedVehicle.maxCapacityKg} kg
                   {selectedVehicle.id === suggestedId && (
-                    <Text style={styles.suggestedBadgeInline}> ★ {t('wizard.recommended')}</Text>
+                    <Text style={styles.suggestedBadgeInline}> <Ionicons name="star" size={12} color={Colors.primary} /> {t('wizard.recommended')}</Text>
                   )}
                 </Text>
               </View>
@@ -207,7 +209,7 @@ const Step3MarketTransport = () => {
             <Text style={styles.dropdownPlaceholder}>{t('wizard.selectVehicle')}</Text>
           )}
         </View>
-        <Text style={styles.dropdownArrow}>{vehicleDropdownOpen ? '▲' : '▼'}</Text>
+        <Text style={styles.dropdownArrow}><Ionicons name={vehicleDropdownOpen ? 'chevron-up' : 'chevron-down'} size={18} color={Colors.textSecondary} /></Text>
       </TouchableOpacity>
 
       {/* Dropdown options */}
@@ -232,7 +234,7 @@ const Step3MarketTransport = () => {
                 activeOpacity={0.7}
               >
                 <View style={styles.dropdownItemLeft}>
-                  <Text style={styles.vehicleIcon}>{vehicle.icon}</Text>
+                  <MaterialCommunityIcons name={vehicle.icon as any} size={24} color={isSelected ? Colors.primaryDark : Colors.textSecondary} />
                   <View>
                     <View style={styles.vehicleNameRow}>
                       <Text style={[styles.vehicleName, isSelected && styles.spotNameActive]}>
@@ -240,7 +242,7 @@ const Step3MarketTransport = () => {
                       </Text>
                       {isSuggested && (
                         <View style={styles.suggestedBadge}>
-                          <Text style={styles.suggestedBadgeText}>★ {t('wizard.recommended')}</Text>
+                          <Text style={styles.suggestedBadgeText}><Ionicons name="star" size={12} color={Colors.primary} /> {t('wizard.recommended')}</Text>
                         </View>
                       )}
                     </View>
@@ -268,7 +270,7 @@ const Step3MarketTransport = () => {
       {/* Transport Summary */}
       {transportInfo && selectedMp && (
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>📦 {t('wizard.transportSummary')}</Text>
+          <Text style={styles.summaryTitle}><Ionicons name="cube" size={18} color={Colors.primaryDark} /> {t('wizard.transportSummary')}</Text>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>{t('wizard.distance')}</Text>
             <Text style={styles.summaryValue}>{selectedMp.distanceKm.toFixed(1)} km</Text>

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Colors, Spacing, BorderRadius, Typography } from '../theme';
 import { AppInput } from '../components/common/AppInput';
 import { AppButton } from '../components/common/AppButton';
@@ -192,8 +193,8 @@ const AuthScreen = () => {
             <AppButton
               title={
                 mode === 'signIn'
-                  ? `${t('auth.secureSignIn')}  →`
-                  : `${t('auth.createAccount')}  →`
+                  ? t('auth.secureSignIn')
+                  : t('auth.createAccount')
               }
               onPress={handleAuth}
               loading={loading}

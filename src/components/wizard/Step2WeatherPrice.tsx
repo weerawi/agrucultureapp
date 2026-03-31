@@ -6,6 +6,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 import { Colors, Spacing, BorderRadius, Typography } from '../../theme';
 import { useForecastStore } from '../../store/useForecastStore';
@@ -64,7 +66,7 @@ const Step2WeatherPrice = () => {
   if (step2Error) {
     return (
       <View style={styles.centerContainer}>
-        <Text style={styles.errorIcon}>⚠️</Text>
+        <Text style={styles.errorIcon}><Ionicons name="warning" size={40} color={Colors.warning} /></Text>
         <Text style={styles.errorText}>{step2Error}</Text>
       </View>
     );
@@ -82,20 +84,20 @@ const Step2WeatherPrice = () => {
       {/* Weather Card */}
       {weather && (
         <View style={styles.card}>
-          <Text style={styles.cardTitle}>🌤️ {t('wizard.weatherData')}</Text>
+          <Text style={styles.cardTitle}><Ionicons name="partly-sunny" size={18} color={Colors.primary} /> {t('wizard.weatherData')}</Text>
           <View style={styles.weatherGrid}>
             <View style={styles.weatherItem}>
-              <Text style={styles.weatherIcon}>🌡️</Text>
+              <MaterialCommunityIcons name="thermometer" size={24} color={Colors.error} />
               <Text style={styles.weatherValue}>{weather.temperature}°C</Text>
               <Text style={styles.weatherLabel}>{t('wizard.temperature')}</Text>
             </View>
             <View style={styles.weatherItem}>
-              <Text style={styles.weatherIcon}>🌧️</Text>
+              <Ionicons name="rainy" size={24} color={Colors.info} />
               <Text style={styles.weatherValue}>{weather.rainfall} mm</Text>
               <Text style={styles.weatherLabel}>{t('wizard.rainfall')}</Text>
             </View>
             <View style={styles.weatherItem}>
-              <Text style={styles.weatherIcon}>💧</Text>
+              <Ionicons name="water" size={24} color={Colors.info} />
               <Text style={styles.weatherValue}>{weather.humidity}%</Text>
               <Text style={styles.weatherLabel}>{t('wizard.humidity')}</Text>
             </View>
@@ -106,7 +108,7 @@ const Step2WeatherPrice = () => {
       {/* Predicted Price Card */}
       {predictedPricePerKg !== null && (
         <View style={[styles.card, styles.priceCard]}>
-          <Text style={styles.cardTitle}>📊 {t('wizard.predictedPrice')}</Text>
+          <Text style={styles.cardTitle}><Ionicons name="analytics" size={18} color={Colors.primary} /> {t('wizard.predictedPrice')}</Text>
           <Text style={styles.priceValue}>
             {formatCurrency(predictedPricePerKg)}
             <Text style={styles.priceUnit}> /kg</Text>
@@ -128,7 +130,7 @@ const Step2WeatherPrice = () => {
 
       <View style={styles.infoBox}>
         <Text style={styles.infoText}>
-          ℹ️ {t('wizard.weatherNote')}
+          <Ionicons name="information-circle" size={14} color={Colors.info} /> {t('wizard.weatherNote')}
         </Text>
       </View>
     </View>
