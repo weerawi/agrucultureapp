@@ -98,7 +98,20 @@ export const useForecastStore = create<WizardState>((set) => ({
   reset: () => set({ ...initialState, targetDate: new Date() }),
 
   setCommodityId: (commodityId) => set({ commodityId }),
-  setRegionId: (regionId) => set({ regionId }),
+  setRegionId: (regionId) =>
+    set((state) => ({
+      regionId,
+      // Clear Step 3 cached data when region changes so marketplaces reload
+      ...(state.regionId !== regionId
+        ? {
+            nearestMarketplaces: [],
+            nearestSpots: [],
+            referenceLocation: null,
+            selectedMarketplaceId: '',
+            selectedSpotId: '',
+          }
+        : {}),
+    })),
   setTargetDate: (targetDate) => set({ targetDate }),
   setQuantityKg: (quantityKg) => set({ quantityKg }),
   setHarvestingCost: (harvestingCost) => set({ harvestingCost }),

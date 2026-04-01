@@ -8,7 +8,7 @@ import {
   Platform,
   Dimensions,
   TextInput,
-  FlatList,
+  ScrollView,
   Keyboard,
 } from 'react-native';
 import MapView, { Marker, Callout, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -79,15 +79,17 @@ const Step3MarketTransport = () => {
       if (nearestMarketplaces.length > 0) return;
       setIsLoadingStep3(true);
       try {
-        // Get user's GPS location
-        const { status } = await Location.requestForegroundPermissionsAsync();
-        let gpsCoords: { lat: number; lng: number } | null = null;
-        if (status === 'granted') {
-          const loc = await Location.getCurrentPositionAsync({
-            accuracy: Location.Accuracy.Balanced,
-          });
-          gpsCoords = { lat: loc.coords.latitude, lng: loc.coords.longitude };
-          setUserLocation(gpsCoords);
+        // Reuse stored GPS location if available, otherwise request
+        let gpsCoords = userLocation;
+        if (!gpsCoords) {
+          const { status } = await Location.requestForegroundPermissionsAsync();
+          if (status === 'granted') {
+            const loc = await Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.Balanced,
+            });
+            gpsCoords = { lat: loc.coords.latitude, lng: loc.coords.longitude };
+            setUserLocation(gpsCoords);
+          }
         }
 
         // Determine reference location: selected region center if different from detected, else GPS
@@ -266,13 +268,14 @@ const Step3MarketTransport = () => {
           </View>
           {suggestions.length > 0 && (
             <View style={styles.suggestionsContainer}>
-              <FlatList
-                data={suggestions}
-                keyExtractor={(item) => item.place_id}
+              <ScrollView
                 keyboardShouldPersistTaps="handled"
                 style={styles.suggestionsList}
-                renderItem={({ item }) => (
+                nestedScrollEnabled
+              >
+                {suggestions.map((item) => (
                   <TouchableOpacity
+                    key={item.place_id}
                     style={styles.suggestionItem}
                     onPress={() => selectSuggestion(item)}
                   >
@@ -286,8 +289,8 @@ const Step3MarketTransport = () => {
                       <Text style={styles.suggestionText} numberOfLines={1}>{item.description}</Text>
                     </View>
                   </TouchableOpacity>
-                )}
-              />
+                ))}
+              </ScrollView>
             </View>
           )}
           <MapView
