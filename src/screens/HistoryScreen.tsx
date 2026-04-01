@@ -8,6 +8,7 @@ import {
   Alert,
   ActivityIndicator,
   RefreshControl,
+  Image,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useFocusEffect } from '@react-navigation/native';
@@ -28,6 +29,12 @@ const recommendationColors: Record<string, string> = {
   SELL: Colors.sellBadge,
   MARGINAL: Colors.holdBadge,
   DONT_SELL: Colors.error,
+};
+
+const recommendationI18nKeys: Record<string, string> = {
+  SELL: 'wizard.sellNow',
+  MARGINAL: 'wizard.marginal',
+  DONT_SELL: 'wizard.dontSell',
 };
 
 const HistoryScreen = () => {
@@ -97,9 +104,14 @@ const HistoryScreen = () => {
       <View style={styles.card}>
         <View style={styles.cardHeader}>
           <View style={styles.cardLeft}>
-            <Text style={styles.commodityIcon}>
-              {commodity?.icon || '🌱'}
-            </Text>
+            {(item.commodityImageUrl || commodity?.imageUrl) ? (
+              <Image
+                source={{ uri: item.commodityImageUrl || commodity?.imageUrl }}
+                style={styles.commodityIconImage}
+              />
+            ) : (
+              <Text style={styles.commodityIcon}>{'🌱'}</Text>
+            )}
             <View>
               <Text style={styles.commodityName}>
                 {commodity ? t(commodity.nameKey) : 'Unknown'}
@@ -128,7 +140,9 @@ const HistoryScreen = () => {
                 },
               ]}
             >
-              {item.profitAnalysis?.recommendation || '—'}
+              {item.profitAnalysis?.recommendation
+                ? t(recommendationI18nKeys[item.profitAnalysis.recommendation] || item.profitAnalysis.recommendation)
+                : '—'}
             </Text>
           </View>
         </View>
@@ -279,6 +293,10 @@ const styles = StyleSheet.create({
   },
   commodityIcon: {
     fontSize: 28,
+  },
+  commodityIconImage: {
+    width: 32,
+    height: 32,
   },
   commodityName: {
     ...Typography.bodyBold,

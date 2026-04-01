@@ -9,6 +9,7 @@ export interface Commodity {
   name: string;
   nameKey: string;
   icon: string;
+  imageUrl?: string;
   modelFeature: string; // exact column name e.g. "vegitable_Commodity_Potato"
   avgPriceRange: { min: number; max: number };
 }
@@ -95,6 +96,7 @@ export interface ForecastResult {
   weather: WeatherData;
   predictedPricePerKg: number;
   profitAnalysis: ProfitAnalysis;
+  commodityImageUrl?: string;
   createdAt: string;
 }
 

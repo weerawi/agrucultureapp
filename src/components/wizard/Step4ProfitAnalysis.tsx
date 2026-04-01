@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   Alert,
+  Image,
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -64,6 +65,7 @@ const Step4ProfitAnalysis = () => {
     if (!user || !profitAnalysis || !weather || !predictedPricePerKg) return;
     setSaving(true);
     try {
+      const commodity = COMMODITIES.find((c) => c.id === commodityId);
       const result: ForecastResult = {
         input: {
           commodityId,
@@ -77,6 +79,7 @@ const Step4ProfitAnalysis = () => {
         weather,
         predictedPricePerKg,
         profitAnalysis,
+        commodityImageUrl: commodity?.imageUrl,
         createdAt: new Date().toISOString(),
       };
       await saveForecast(user.uid, result);
@@ -140,9 +143,14 @@ const Step4ProfitAnalysis = () => {
 
       {/* Summary Header */}
       <View style={styles.summaryHeader}>
-        <Text style={styles.commodityText}>
-          {commodity?.icon} {commodity ? t(commodity.nameKey) : ''} — {region ? t(region.nameKey) : ''}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+          {commodity?.imageUrl ? (
+            <Image source={{ uri: commodity.imageUrl }} style={{ width: 24, height: 24 }} />
+          ) : null}
+          <Text style={styles.commodityText}>
+            {commodity ? t(commodity.nameKey) : ''} — {region ? t(region.nameKey) : ''}
+          </Text>
+        </View>
       </View>
 
       {/* Breakdown Card */}
